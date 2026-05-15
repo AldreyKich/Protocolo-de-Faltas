@@ -2,6 +2,7 @@
 define('BASE_URL', '/protocolo_faltas/');
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/includes/auth.php';
+requirePerfil(['ADMINISTRADOR', 'SECRETARIA']);
 
 $pageTitle = 'Alunos';
 $db  = getDB();
@@ -10,6 +11,12 @@ $msgType = 'success';
 
 // ---- Ações POST ----
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_is_valid($_POST['csrf_token'] ?? null)) {
+        $msg = 'Sessão expirada. Recarregue a página e tente novamente.';
+        $msgType = 'danger';
+        $_POST['acao'] = '';
+    }
+
     $acao = $_POST['acao'] ?? '';
 
     if ($acao === 'salvar') {
@@ -164,6 +171,7 @@ include __DIR__ . '/includes/sidebar.php';
                                     </button>
                                     <?php if ($_SESSION['usuario_perfil'] === 'ADMINISTRADOR'): ?>
                                     <form method="POST" class="d-inline">
+                                        <?= csrf_input() ?>
                                         <input type="hidden" name="acao" value="excluir">
                                         <input type="hidden" name="id_aluno" value="<?= $a['id_aluno'] ?>">
                                         <button type="submit" class="btn btn-sm btn-outline-danger btn-delete-confirm">
@@ -193,6 +201,7 @@ include __DIR__ . '/includes/sidebar.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
+                <?= csrf_input() ?>
                 <input type="hidden" name="acao" value="salvar">
                 <input type="hidden" name="id_aluno" id="form_id_aluno">
                 <div class="modal-body">

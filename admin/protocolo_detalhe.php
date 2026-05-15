@@ -41,6 +41,19 @@ $msg = '';
 $msgType = 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['novo_status'])) {
+    if ($_SESSION['usuario_perfil'] === 'VISUALIZADOR') {
+        http_response_code(403);
+        die('Acesso negado.');
+    }
+
+    if (!csrf_is_valid($_POST['csrf_token'] ?? null)) {
+        $msg = 'Sessão expirada. Recarregue a página e tente novamente.';
+        $msgType = 'danger';
+        unset($_POST['novo_status']);
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['novo_status'])) {
     $novoStatus = $_POST['novo_status'];
     $obs        = trim($_POST['observacoes'] ?? '');
     $statusValidos = ['ENVIADO', 'EM_ANALISE', 'APROVADO', 'REJEITADO'];
@@ -208,7 +221,7 @@ include __DIR__ . '/includes/sidebar.php';
                                         <?= htmlspecialchars($a['nome_arquivo']) ?>
                                         <small class="text-muted ms-2"><?= htmlspecialchars($a['tipo_arquivo'] ?? '') ?></small>
                                     </div>
-                                    <a href="<?= BASE_URL ?>uploads/<?= htmlspecialchars($a['caminho_arquivo']) ?>"
+                                    <a href="<?= BASE_URL ?>admin/anexo.php?id=<?= (int) $a['id_anexo'] ?>"
                                        target="_blank" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-download"></i> Abrir
                                     </a>
@@ -229,6 +242,7 @@ include __DIR__ . '/includes/sidebar.php';
                 </div>
                 <div class="card-body">
                     <form method="POST">
+                        <?= csrf_input() ?>
                         <div class="mb-3">
                             <label class="form-label">Novo Status</label>
                             <select name="novo_status" class="form-select" required>

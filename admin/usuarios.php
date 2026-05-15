@@ -10,6 +10,12 @@ $msg = '';
 $msgType = 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_is_valid($_POST['csrf_token'] ?? null)) {
+        $msg = 'Sessão expirada. Recarregue a página e tente novamente.';
+        $msgType = 'danger';
+        $_POST['acao'] = '';
+    }
+
     $acao = $_POST['acao'] ?? '';
 
     if ($acao === 'salvar') {
@@ -21,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $senha  = $_POST['senha'] ?? '';
         $perfisValidos = ['ADMINISTRADOR', 'SECRETARIA', 'VISUALIZADOR'];
 
-        if ($nome === '' || $email === '' || !in_array($perfil, $perfisValidos, true)) {
+        if ($nome === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || !in_array($perfil, $perfisValidos, true) || ($senha !== '' && strlen($senha) < 8)) {
             $msg = 'Preencha todos os campos obrigatórios.';
             $msgType = 'danger';
         } else {
@@ -132,6 +138,7 @@ include __DIR__ . '/includes/sidebar.php';
                                 </button>
                                 <?php if ($u['id_usuario'] != $_SESSION['usuario_id']): ?>
                                 <form method="POST" class="d-inline">
+                                    <?= csrf_input() ?>
                                     <input type="hidden" name="acao" value="excluir">
                                     <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-danger btn-delete-confirm">
@@ -160,6 +167,7 @@ include __DIR__ . '/includes/sidebar.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
+                <?= csrf_input() ?>
                 <input type="hidden" name="acao" value="salvar">
                 <input type="hidden" name="id_usuario" id="form_id_usuario">
                 <div class="modal-body">

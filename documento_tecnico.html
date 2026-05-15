@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Técnico - Protocolo de Faltas</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --text: #172033;
+            --muted: #5d6b82;
+            --primary: #1d4ed8;
+            --border: #d8e0ec;
+            --surface: #ffffff;
+            --code: #eef3fb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.55;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .page {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 32px 20px 56px;
+        }
+
+        header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        h1, h2, h3 {
+            line-height: 1.2;
+            margin: 0 0 12px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        h2 {
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            margin-top: 32px;
+        }
+
+        h3 {
+            margin-top: 24px;
+        }
+
+        p {
+            margin: 0 0 12px;
+        }
+
+        .meta {
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .toc li {
+            margin: 6px 0;
+        }
+
+        code {
+            background: var(--code);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background: #111827;
+            color: #f9fafb;
+            border-radius: 8px;
+            overflow-x: auto;
+            padding: 18px;
+            line-height: 1.45;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0 22px;
+            background: var(--surface);
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        th {
+            background: #eaf0fb;
+            color: #102a56;
+        }
+
+        .note {
+            border-left: 4px solid var(--primary);
+            background: #eef5ff;
+            padding: 12px 14px;
+            margin: 16px 0;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .page {
+                padding: 0;
+            }
+
+            .card, header {
+                border: none;
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <header>
+            <h1>Manual Técnico do Projeto</h1>
+            <p><strong>Sistema:</strong> Protocolo Eletrônico de Justificativas de Faltas</p>
+            <p><strong>Diretório base:</strong> <code>protocolo_faltas/</code></p>
+            <p class="meta">Documento técnico com a arquitetura do projeto, organização de pastas e responsabilidades dos principais arquivos.</p>
+        </header>
+
+        <section class="card toc">
+            <h2 id="sumario">Sumário</h2>
+            <ol>
+                <li><a href="#visao-geral">Visão Geral</a></li>
+                <li><a href="#arquitetura">Arquitetura do Projeto</a></li>
+                <li><a href="#pastas-arquivos">Pastas e Arquivos</a></li>
+                <li><a href="#fluxos">Fluxos Principais</a></li>
+                <li><a href="#seguranca">Aspectos de Segurança</a></li>
+                <li><a href="#banco">Banco de Dados</a></li>
+            </ol>
+        </section>
+
+        <section class="card" id="visao-geral">
+            <h2>1. Visão Geral</h2>
+            <p>O projeto é uma aplicação web em PHP com MySQL, destinada ao registro, consulta e gestão administrativa de justificativas de faltas escolares.</p>
+            <p>A aplicação possui duas áreas principais:</p>
+            <ul>
+                <li><strong>Portal público:</strong> utilizado por responsáveis para enviar justificativas e consultar protocolos.</li>
+                <li><strong>Área administrativa:</strong> utilizada por usuários autenticados para consultar, analisar e gerenciar protocolos, alunos e usuários.</li>
+            </ul>
+            <p>A arquitetura é procedural, com separação por diretórios funcionais e arquivos de configuração compartilhados.</p>
+        </section>
+
+        <section class="card" id="arquitetura">
+            <h2>2. Arquitetura do Projeto</h2>
+            <p>A estrutura segue uma divisão simples por responsabilidade:</p>
+            <pre><code>protocolo_faltas/
+|-- admin/                 Área administrativa autenticada
+|   |-- includes/          Componentes e funções comuns do admin
+|-- assets/                Arquivos estáticos de CSS e JavaScript
+|-- config/                Configurações gerais e conexão com banco
+|-- public/                Páginas do portal público
+|-- uploads/               Arquivos enviados pelos usuários
+|-- SQL_Cria_BD_Tabelas.sql Script de criação do banco
+|-- README.md              Documentação geral do projeto
+|-- .htaccess              Proteções básicas no Apache
+|-- documento_tecnico.html Este manual técnico</code></pre>
+
+            <h3>Camadas lógicas</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Camada</th>
+                        <th>Responsabilidade</th>
+                        <th>Arquivos relacionados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Apresentação pública</td>
+                        <td>Exibe telas para responsáveis enviarem e consultarem justificativas.</td>
+                        <td><code>public/index.php</code>, <code>public/novo_protocolo.php</code>, <code>public/consultar.php</code>, <code>public/confirmacao.php</code></td>
+                    </tr>
+                    <tr>
+                        <td>Administração</td>
+                        <td>Permite login, dashboard, consulta de protocolos, gestão de alunos, usuários e anexos.</td>
+                        <td><code>admin/*.php</code>, <code>admin/includes/*.php</code></td>
+                    </tr>
+                    <tr>
+                        <td>Configuração</td>
+                        <td>Centraliza constantes, sessão, segurança, CSRF e conexão PDO.</td>
+                        <td><code>config/config.php</code>, <code>config/db.php</code></td>
+                    </tr>
+                    <tr>
+                        <td>Persistência</td>
+                        <td>Banco MySQL acessado via PDO e scripts SQL de criação/população.</td>
+                        <td><code>SQL_Cria_BD_Tabelas.sql</code>, <code>config/seed.sql</code></td>
+                    </tr>
+                    <tr>
+                        <td>Recursos estáticos</td>
+                        <td>Estilos e scripts globais da interface.</td>
+                        <td><code>assets/css/style.css</code>, <code>assets/js/main.js</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card" id="pastas-arquivos">
+            <h2>3. Pastas e Arquivos</h2>
+
+            <h3>Raiz do projeto</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Arquivo/Pasta</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>.htaccess</code></td>
+                        <td>Define proteções básicas no Apache, como bloqueio de listagem de diretórios e negação de acesso direto a arquivos sensíveis como <code>.sql</code>, <code>.zip</code>, <code>.env</code> e logs.</td>
+                    </tr>
+                    <tr>
+                        <td><code>README.md</code></td>
+                        <td>Documentação geral do sistema, com descrição, funcionalidades, instalação e uso.</td>
+                    </tr>
+                    <tr>
+                        <td><code>SQL_Cria_BD_Tabelas.sql</code></td>
+                        <td>Script responsável por criar o banco <code>protocolo_faltas</code> e suas tabelas principais.</td>
+                    </tr>
+                    <tr>
+                        <td><code>documento_tecnico.html</code></td>
+                        <td>Manual técnico do projeto.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3><code>config/</code></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Arquivo</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>config/config.php</code></td>
+                        <td>Arquivo de configuração principal. Define <code>BASE_URL</code>, diretório de uploads, tipos permitidos, tamanho máximo, timezone, cabeçalhos de segurança, parâmetros de sessão, funções CSRF e validação de CPF.</td>
+                    </tr>
+                    <tr>
+                        <td><code>config/db.php</code></td>
+                        <td>Cria a conexão com o banco via PDO. Lê configurações de variáveis de ambiente quando disponíveis e usa valores padrão locais como fallback.</td>
+                    </tr>
+                    <tr>
+                        <td><code>config/seed.sql</code></td>
+                        <td>Script de dados iniciais, com usuários e alunos de exemplo. Usado apenas durante a preparação inicial do banco.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3><code>public/</code></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Arquivo</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>public/index.php</code></td>
+                        <td>Página inicial do portal público. Apresenta o sistema e direciona para envio ou consulta de protocolos.</td>
+                    </tr>
+                    <tr>
+                        <td><code>public/novo_protocolo.php</code></td>
+                        <td>Formulário público para envio de justificativa. Realiza validações, cria/atualiza responsável, gera número de protocolo, registra o protocolo e salva anexo quando enviado.</td>
+                    </tr>
+                    <tr>
+                        <td><code>public/confirmacao.php</code></td>
+                        <td>Exibe a confirmação de envio com o número de protocolo gerado e dados resumidos.</td>
+                    </tr>
+                    <tr>
+                        <td><code>public/consultar.php</code></td>
+                        <td>Permite consultar o status de um protocolo pelo número gerado no envio.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3><code>admin/</code></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Arquivo</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>admin/login.php</code></td>
+                        <td>Tela de login administrativo. Valida usuário ativo, verifica senha com <code>password_verify</code> e inicia sessão autenticada.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/logout.php</code></td>
+                        <td>Finaliza a sessão do usuário e redireciona para a tela de login.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/dashboard.php</code></td>
+                        <td>Painel inicial administrativo com indicadores por status e lista de protocolos recentes.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/protocolos.php</code></td>
+                        <td>Lista protocolos com filtros por busca, status, turma e data da falta.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/protocolo_detalhe.php</code></td>
+                        <td>Exibe detalhes completos de um protocolo, dados do aluno, responsável, anexos e permite alteração de status para perfis autorizados.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/anexo.php</code></td>
+                        <td>Rota autenticada para servir anexos armazenados em <code>uploads/</code>, evitando acesso direto aos arquivos enviados.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/alunos.php</code></td>
+                        <td>Permite cadastro, edição, listagem, busca e exclusão de alunos para perfis autorizados.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/usuarios.php</code></td>
+                        <td>Permite ao administrador cadastrar, editar, ativar/desativar e excluir usuários administrativos.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3><code>admin/includes/</code></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Arquivo</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>admin/includes/auth.php</code></td>
+                        <td>Verifica se há usuário autenticado e fornece a função <code>requirePerfil()</code> para controle de acesso por perfil.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/includes/header.php</code></td>
+                        <td>Cabeçalho HTML compartilhado pelas páginas administrativas.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/includes/sidebar.php</code></td>
+                        <td>Menu lateral administrativo, exibindo links conforme o perfil do usuario.</td>
+                    </tr>
+                    <tr>
+                        <td><code>admin/includes/footer.php</code></td>
+                        <td>Rodapé HTML compartilhado e inclusão dos scripts globais.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3><code>assets/</code></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Arquivo</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>assets/css/style.css</code></td>
+                        <td>Folha de estilos global usada pelo portal público e área administrativa.</td>
+                    </tr>
+                    <tr>
+                        <td><code>assets/js/main.js</code></td>
+                        <td>Scripts globais para upload drag-and-drop, máscaras de CPF/telefone, menu mobile, alertas temporários, confirmação de exclusão e tooltips.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3><code>uploads/</code></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Arquivo/Pasta</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>uploads/</code></td>
+                        <td>Armazena arquivos anexados aos protocolos. O acesso direto deve ser bloqueado; a abertura deve ocorrer por <code>admin/anexo.php</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code>uploads/.htaccess</code></td>
+                        <td>Bloqueia listagem, execução de scripts e acesso direto aos arquivos enviados.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card" id="fluxos">
+            <h2>4. Fluxos Principais</h2>
+            <h3>Envio de justificativa</h3>
+            <ol>
+                <li>Responsável acessa <code>public/novo_protocolo.php</code>.</li>
+                <li>Sistema lista alunos ativos.</li>
+                <li>Responsável preenche dados da falta, justificativa, CPF, contato e anexo opcional.</li>
+                <li>Sistema valida CSRF, data, CPF, e-mail e arquivo enviado.</li>
+                <li>Sistema cria ou atualiza o responsável, registra o protocolo e salva o anexo.</li>
+                <li>Usuário é redirecionado para <code>public/confirmacao.php</code>.</li>
+            </ol>
+
+            <h3>Consulta pública</h3>
+            <ol>
+                <li>Responsável acessa <code>public/consultar.php</code>.</li>
+                <li>Informa o número do protocolo.</li>
+                <li>Sistema localiza o registro e exibe status, aluno, data, motivo e observações quando houver.</li>
+            </ol>
+
+            <h3>Análise administrativa</h3>
+            <ol>
+                <li>Usuário acessa <code>admin/login.php</code> e autentica.</li>
+                <li>Acessa <code>admin/protocolos.php</code> para localizar protocolos.</li>
+                <li>Abre <code>admin/protocolo_detalhe.php</code> para consultar dados e anexos.</li>
+                <li>Perfis autorizados alteram status e observações do protocolo.</li>
+            </ol>
+        </section>
+
+        <section class="card" id="seguranca">
+            <h2>5. Aspectos de Segurança</h2>
+            <ul>
+                <li>Consultas e alterações no banco utilizam PDO com prepared statements.</li>
+                <li>Senhas de usuários administrativos são validadas com <code>password_verify()</code>.</li>
+                <li>Formulários POST usam token CSRF.</li>
+                <li>Saídas HTML relevantes usam <code>htmlspecialchars()</code>.</li>
+                <li>Uploads aceitam apenas PDF, JPEG e PNG, com limite de 5 MB.</li>
+                <li>Anexos são servidos por rota autenticada.</li>
+                <li>A pasta <code>uploads/</code> bloqueia acesso direto e execução de scripts via <code>.htaccess</code>.</li>
+                <li>Arquivos sensíveis na raiz, como SQL e ZIP, são bloqueados por <code>.htaccess</code>.</li>
+            </ul>
+            <div class="note">
+                <strong>Recomendação:</strong> em ambiente de produção, manter backups fora do diretório público do Apache e configurar credenciais do banco por variáveis de ambiente.
+            </div>
+        </section>
+
+        <section class="card" id="banco">
+            <h2>6. Banco de Dados</h2>
+            <p>O banco principal é <code>protocolo_faltas</code>. As tabelas principais são:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tabela</th>
+                        <th>Finalidade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>usuario</code></td>
+                        <td>Usuários administrativos, perfis, status ativo e senha criptografada.</td>
+                    </tr>
+                    <tr>
+                        <td><code>aluno</code></td>
+                        <td>Cadastro de alunos, matrícula, turma e contatos.</td>
+                    </tr>
+                    <tr>
+                        <td><code>responsavel</code></td>
+                        <td>Dados do responsável vinculado ao protocolo.</td>
+                    </tr>
+                    <tr>
+                        <td><code>protocolo</code></td>
+                        <td>Registro da justificativa, status, data da falta, observações e vínculos com aluno/responsável/usuário.</td>
+                    </tr>
+                    <tr>
+                        <td><code>anexo</code></td>
+                        <td>Metadados dos arquivos anexados aos protocolos.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>

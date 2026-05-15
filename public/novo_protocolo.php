@@ -10,6 +10,10 @@ $dados  = [];
 $alunos = $db->query("SELECT id_aluno, nome, matricula, turma FROM aluno WHERE ativo = 1 ORDER BY nome")->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_is_valid($_POST['csrf_token'] ?? null)) {
+        $erros[] = 'Sessão expirada. Recarregue a página e tente novamente.';
+    }
+
     // Coletar dados
     $dados['id_aluno']    = filter_input(INPUT_POST, 'id_aluno', FILTER_VALIDATE_INT);
     $dados['data_falta']  = trim($_POST['data_falta'] ?? '');
@@ -19,9 +23,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dados['resp_tel']    = trim($_POST['resp_tel'] ?? '');
     $dados['resp_email']  = trim($_POST['resp_email'] ?? '');
 
+    if ($dados['resp_cpf'] !== '' && !cpf_is_valid($dados['resp_cpf'])) {
+        $erros[] = 'CPF do responsável inválido.';
+    }
+
+    if ($dados['resp_email'] !== '' && !filter_var($dados['resp_email'], FILTER_VALIDATE_EMAIL)) {
+        $erros[] = 'E-mail do responsável inválido.';
+    }
+
     // Validações
     if (!$dados['id_aluno'])          $erros[] = 'Selecione o aluno.';
     if ($dados['data_falta'] === '')  $erros[] = 'Informe a data da falta.';
+    elseif (!DateTime::createFromFormat('Y-m-d', $dados['data_falta'])) $erros[] = 'Data da falta inválida.';
     if ($dados['motivo'] === '')      $erros[] = 'Descreva o motivo da falta.';
     if ($dados['resp_nome'] === '')   $erros[] = 'Informe o nome do responsável.';
     if (strlen($dados['resp_cpf']) !== 11) $erros[] = 'CPF do responsável inválido.';
@@ -38,17 +51,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_FILES['anexo']) && $_FILES['anexo']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['anexo'];
+
+        if (!is_uploaded_file($file['tmp_name'])) {
+            $erros[] = 'Falha ao receber o arquivo enviado.';
+        }
+
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->file($file['tmp_name']);
 
         if (!in_array($mimeType, ALLOWED_TYPES, true)) {
             $erros[] = 'Tipo de arquivo não permitido. Use PDF, JPG ou PNG.';
-        } elseif ($file['size'] > MAX_FILE_SIZE) {
+        } elseif ($file['size'] <= 0 || $file['size'] > MAX_FILE_SIZE) {
             $erros[] = 'Arquivo muito grande. Máximo 5 MB.';
         } else {
-            $ext          = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $anexoCaminho = uniqid('atestado_', true) . '.' . $ext;
-            $anexoNome    = $file['name'];
+            $ext          = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'application/pdf' => 'pdf'][$mimeType] ?? null;
+            $anexoCaminho = 'atestado_' . bin2hex(random_bytes(16)) . '.' . $ext;
+            $anexoNome    = basename($file['name']);
             $anexoTipo    = $mimeType;
         }
     }
@@ -74,7 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Gerar número de protocolo: PROT-YYYYMMDD-XXXXX
-            $numProtocolo = 'PROT-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
+            do {
+                $numProtocolo = 'PROT-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(4)));
+                $stmtCheck = $db->prepare("SELECT COUNT(*) FROM protocolo WHERE numero_protocolo = ?");
+                $stmtCheck->execute([$numProtocolo]);
+            } while ((int) $stmtCheck->fetchColumn() > 0);
 
             // Inserir protocolo
             $db->prepare("
@@ -85,7 +107,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Salvar arquivo
             if ($anexoCaminho) {
-                move_uploaded_file($_FILES['anexo']['tmp_name'], UPLOAD_DIR . $anexoCaminho);
+                if (!is_dir(UPLOAD_DIR)) {
+                    mkdir(UPLOAD_DIR, 0755, true);
+                }
+
+                if (!move_uploaded_file($_FILES['anexo']['tmp_name'], UPLOAD_DIR . $anexoCaminho)) {
+                    throw new RuntimeException('Falha ao salvar arquivo enviado.');
+                }
+
                 $db->prepare("INSERT INTO anexo (nome_arquivo, caminho_arquivo, tipo_arquivo, id_protocolo) VALUES (?,?,?,?)")
                    ->execute([$anexoNome, $anexoCaminho, $anexoTipo, $idProtocolo]);
             }
@@ -557,6 +586,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php else: ?>
 
                 <form method="POST" enctype="multipart/form-data" novalidate>
+                    <?= csrf_input() ?>
 
                     <!-- Dados do Aluno -->
                     <h6 class="section-title">

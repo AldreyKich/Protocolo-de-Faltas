@@ -1,5 +1,3 @@
-# Protocolo-de-Faltas
-
 # 📋 Protocolo Eletrônico de Justificativas de Faltas
 
 <div align="center">
@@ -21,7 +19,7 @@ Sistema web moderno para gerenciamento digital de justificativas de faltas escol
 
 O **Protocolo Eletrônico de Justificativas de Faltas** é uma solução completa para digitalizar e automatizar o processo de justificativa de faltas em instituições de ensino. O sistema elimina a necessidade de deslocamento presencial, permitindo que responsáveis enviem atestados médicos e acompanhem o status da análise de forma online e transparente.
 
-### Problema Resolvido
+### 🎯 Problema Resolvido
 
 - ❌ Deslocamento presencial obrigatório para entregar documentos
 - ❌ Perda ou extravio de documentos físicos
@@ -29,7 +27,7 @@ O **Protocolo Eletrônico de Justificativas de Faltas** é uma solução complet
 - ❌ Dificuldade em consultar o histórico de protocolos
 - ❌ Processo manual e demorado para a secretaria
 
-### Solução Oferecida
+### ✅ Solução Oferecida
 
 - ✔️ Envio 100% digital de justificativas e atestados
 - ✔️ Armazenamento seguro de documentos
@@ -40,9 +38,9 @@ O **Protocolo Eletrônico de Justificativas de Faltas** é uma solução complet
 
 ---
 
-##  Funcionalidades
+## ✨ Funcionalidades
 
-###  Portal Público
+### 🌐 Portal Público
 
 - **Página Inicial Moderna**: Design intuitivo com animações e gradientes
 - **Envio de Justificativas**: Formulário completo com validações
@@ -58,7 +56,7 @@ O **Protocolo Eletrônico de Justificativas de Faltas** é uma solução complet
   - Visualização de anexos
 - **Confirmação de Envio**: Página com número de protocolo gerado
 
-###  Área Administrativa
+### 🔐 Área Administrativa
 
 - **Dashboard**: Visão geral com estatísticas
   - Total de protocolos por status
@@ -79,7 +77,7 @@ O **Protocolo Eletrônico de Justificativas de Faltas** é uma solução complet
   - Definição de perfis de acesso
   - Gerenciamento de permissões
 
-###  Perfis de Acesso
+### 👥 Perfis de Acesso
 
 | Perfil | Permissões |
 |--------|-----------|
@@ -89,7 +87,7 @@ O **Protocolo Eletrônico de Justificativas de Faltas** é uma solução complet
 
 ---
 
-##  Tecnologias
+## 🚀 Tecnologias
 
 ### Backend
 - **PHP 7.4+**: Linguagem principal
@@ -111,7 +109,7 @@ O **Protocolo Eletrônico de Justificativas de Faltas** é uma solução complet
 
 ---
 
-##  Instalação
+## 📦 Instalação
 
 ### Pré-requisitos
 
@@ -169,7 +167,7 @@ chmod 755 uploads/
 
 ---
 
-##  Credenciais Padrão
+## 🔑 Credenciais Padrão
 
 Após executar o `seed.sql`, use estas credenciais para primeiro acesso:
 
@@ -178,11 +176,11 @@ Após executar o `seed.sql`, use estas credenciais para primeiro acesso:
 | Administrador | admin@escola.com | password |
 | Secretaria | secretaria@escola.com | password |
 
->  **IMPORTANTE**: Altere as senhas imediatamente após o primeiro acesso!
+> ⚠️ **IMPORTANTE**: Altere as senhas imediatamente após o primeiro acesso!
 
 ---
 
-##  Uso
+## 📱 Uso
 
 ### Para Responsáveis (Portal Público)
 
@@ -212,7 +210,7 @@ Após executar o `seed.sql`, use estas credenciais para primeiro acesso:
 
 ---
 
-##  Estrutura do Projeto
+## 📂 Estrutura do Projeto
 
 ```
 protocolo_faltas/
@@ -258,7 +256,7 @@ protocolo_faltas/
 
 ---
 
-##  Estrutura do Banco de Dados
+## 🗄️ Estrutura do Banco de Dados
 
 ### Tabelas Principais
 
@@ -284,7 +282,7 @@ protocolo_faltas/
 
 ---
 
-##  Design e Interface
+## 🎨 Design e Interface
 
 ### Características Visuais
 
@@ -312,7 +310,7 @@ protocolo_faltas/
 
 ---
 
-##  Segurança
+## 🔒 Segurança
 
 - **Autenticação**: Sistema de login com sessões PHP
 - **Senhas**: Hash com `password_hash()` (bcrypt)
@@ -324,7 +322,7 @@ protocolo_faltas/
 
 ---
 
-##  Contribuindo
+## 🤝 Contribuindo
 
 Contribuições são bem-vindas! Para contribuir:
 
@@ -336,25 +334,25 @@ Contribuições são bem-vindas! Para contribuir:
 
 ---
 
-##  Licença
+## 📝 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 
-##  Autor
+## 👨‍💻 Autor
 
 Desenvolvido com ❤️ para facilitar a gestão escolar.
 
 ---
 
-##  Suporte
+## 📞 Suporte
 
 Encontrou um bug ou tem uma sugestão? Abra uma [issue](https://github.com/seu-usuario/protocolo-faltas/issues).
 
 ---
 
-##  Roadmap
+## 🎯 Roadmap
 
 - [ ] Sistema de notificações por e-mail
 - [ ] Exportação de relatórios em PDF

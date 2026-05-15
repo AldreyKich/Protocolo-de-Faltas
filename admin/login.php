@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $senha = $_POST['senha'] ?? '';
 
-    if ($email === '' || $senha === '') {
+    if (!csrf_is_valid($_POST['csrf_token'] ?? null)) {
+        $erro = 'Sessão expirada. Recarregue a página e tente novamente.';
+    } elseif ($email === '' || $senha === '') {
         $erro = 'Preencha e-mail e senha.';
     } else {
         $db   = getDB();
@@ -61,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form method="POST" novalidate>
+                <?= csrf_input() ?>
                 <div class="mb-3">
                     <label class="form-label" for="email">
                         <i class="bi bi-envelope"></i> E-mail
